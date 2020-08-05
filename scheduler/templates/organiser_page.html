@@ -1,0 +1,29 @@
+<body style="background:#F7F7F7;">
+    <div class="">
+      <a class="hiddenanchor" id="toregister"></a>
+      <a class="hiddenanchor" id="tologin"></a>
+
+      <div id="wrapper">
+        <div id="login" class="form">
+          <section class="login_content">
+            <form action={% url "organiser_page" %} method="post">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit" value="Submit">
+            </form>        
+            <div class="clearfix"></div>
+            <div class="separator">
+              <div class="clearfix"></div>
+              <br />
+              <div>
+                <h1><i class="fa fa-male" style="font-size: 26px;"></i> Made by Varad Bhatnagar <i class="fa fa-female"
+                                                                                            style="font-size:
+                                                                                            26px";></i></h1>
+                <p>&copy; {% now 'Y' %} All Rights Reserved.</p>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </body>
