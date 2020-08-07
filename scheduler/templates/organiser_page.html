@@ -1,4 +1,23 @@
-<body style="background:#F7F7F7;">
+{% load static %}
+
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Oragniser Page</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'scheduler/style.css' %}">
+</head>
+<body>
+
+  <div class = "page-header">
+    <h1>
+        Simple Meeting Scheduler
+    </h1>
+  </div>
+
+  <hr>
+  <h2> Create a New Meeting</h2>
+
     <div class="">
       <a class="hiddenanchor" id="toregister"></a>
       <a class="hiddenanchor" id="tologin"></a>
@@ -8,22 +27,27 @@
           <section class="login_content">
             <form action={% url "organiser_page" %} method="post">
                 {% csrf_token %}
-                {{ form.as_p }}
+                <table class="centerTable" >
+                  {{ form.as_table }}
+                </table>
+                <br>
                 <input type="submit" value="Submit">
             </form>        
             <div class="clearfix"></div>
             <div class="separator">
               <div class="clearfix"></div>
               <br />
-              <div>
+              <footer class="fixed-bottom">
+                <hr>
                 <h1><i class="fa fa-male" style="font-size: 26px;"></i> Made by Varad Bhatnagar <i class="fa fa-female"
                                                                                             style="font-size:
                                                                                             26px";></i></h1>
                 <p>&copy; {% now 'Y' %} All Rights Reserved.</p>
-              </div>
+              </footer>
             </div>
           </section>
         </div>
       </div>
     </div>
   </body>
+</html>

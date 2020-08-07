@@ -1,0 +1,54 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Response Page</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'scheduler/style.css' %}">
+</head>
+<body>
+
+    <div class = "page-header">
+        <h1>
+            Simple Meeting Scheduler
+        </h1>
+      </div>
+    
+      <hr>
+      <h2> Meeting Response </h2>
+
+    <div class="">
+      <a class="hiddenanchor" id="toregister"></a>
+      <a class="hiddenanchor" id="tologin"></a>
+
+      <div id="wrapper">
+        <div id="login" class="form">
+          <section class="login_content">
+            <form>
+                {% csrf_token %}
+                <table class="twocolumnTable" >
+                  {{ form.as_table }}
+                </table>
+                <br>
+              </form>  
+            
+            <div class="clearfix"></div>
+            <div class="separator">
+              <div class="clearfix"></div>
+              <br />
+                <footer class="fixed-bottom">
+                    <hr>
+                    <h1><i class="fa fa-male" style="font-size: 26px;"></i> Made by Varad Bhatnagar <i class="fa fa-female"
+                                                                                                style="font-size:
+                                                                                                26px";></i></h1>
+                    <p>&copy; {% now 'Y' %} All Rights Reserved.</p>
+                </footer>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

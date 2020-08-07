@@ -1,0 +1,21 @@
+footer {
+    position: fixed;
+    height: 100px;
+    bottom: 0;
+    width: 100%;
+}
+
+.centerTable { margin: 0px auto; 
+    border-collapse: separate;
+    border-spacing: 0 1em;            
+}
+
+.twocolumnTable { margin: 0px auto; 
+    border-collapse: separate;
+    border-spacing: 0 1em;            
+}
+
+body{
+    background:#F7F7F7; 
+    text-align: center;
+}

@@ -8,6 +8,7 @@ class Meeting(models.Model):
     organiser = models.ForeignKey(Participant, on_delete=models.CASCADE)
     date = models.DateField()
     duration = models.CharField(max_length=10)
+    title = models.CharField(max_length=100)
 
 class MeetingParticipant(models.Model):
     participant = models.ForeignKey(Participant, on_delete=models.CASCADE)
