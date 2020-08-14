@@ -1,21 +1,18 @@
 import datetime
-import random
-import string
-import itertools
+from random import randint
 import numpy
+from hashids import Hashids
 
 
-NUMBER_OF_MINUTES_IN_A_DAY = 1080  # (6am to 12am)
-
-
-def get_random_alphanumeric_string():
-    letters_and_digits = string.ascii_letters + string.digits
-    result_str = ''.join((random.choice(letters_and_digits)
-                          for i in range(10)))
-    return result_str
+def get_hash():
+    r1 = randint(0, 5000)
+    r2 = r1 * randint(0,10) + randint(0, 5000)
+    hashids = Hashids(salt='meetings is cool', min_length=10)
+    hash = hashids.encode(int(r2))
+    return hash
     
 
-def update_best_slots(queryset, best_slots):
+def update_current_suitable_slots(queryset, best_slots):
     participant_free_slots = list(queryset)
 
     for i in participant_free_slots:
@@ -25,24 +22,25 @@ def update_best_slots(queryset, best_slots):
     return best_slots
 
 
-def get_slots(slot_size):
+def get_slot_choices(slot_size):
     tuples_list = list()
-    start_time = datetime.datetime.strptime('6:00', '%H:%M')
+    start_time = datetime.datetime.strptime('8:00', '%H:%M')
     end_time = datetime.datetime.strptime('23:59', '%H:%M')
 
     i = 0
-    while start_time <= end_time:
+    while start_time + datetime.timedelta(minutes=slot_size) < end_time:
         tuples_list.append(
             (i, str(start_time.time()) + " to " +
              str((start_time + datetime.timedelta(minutes=slot_size)).time()))
         )
-        start_time += datetime.timedelta(minutes=slot_size)
+        start_time += datetime.timedelta(minutes=30)
         i = i + 1
 
-    return tuples_list
+    return tuples_list, i
 
-def get_feasible_slots(slot_list, limit = 5):
-    return numpy.argsort(-1* numpy.array(slot_list))[0:limit]
+
+def get_most_suitable_slots(slot_list, limit = 5):
+    return numpy.argsort(-1* numpy.array(slot_list), kind='stable')[0:limit]
 
 
 def flip_slots(slot_list, total_slots):

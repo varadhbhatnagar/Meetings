@@ -1,10 +1,9 @@
 from django import forms
 import datetime
-from .util import get_slots
-from .models import Meeting, Participant
+from .util import get_slot_choices
+from .models import Meeting
 
 DURATION_CHOICES =( 
-    ("15", "15 Minutes"), 
     ("30", "30 Minutes"), 
     ("45", "45 Minutes"), 
     ("60", "1 Hour"), 
@@ -33,7 +32,7 @@ class ParticipantForm(forms.Form):
     def __init__(self, meeting_hash, *args, **kwargs):
         
         super(ParticipantForm, self).__init__(*args, **kwargs)
-        self.fields['slot'].choices = get_slots(int(Meeting.objects.get(meeting_hash = meeting_hash).duration))
+        self.fields['slot'].choices, _ = get_slot_choices(int(Meeting.objects.get(meeting_hash = meeting_hash).duration))
         self.fields['meeting_hash'].initial = meeting_hash
         self.fields['organiser_contact_number'].initial = Meeting.objects.get(meeting_hash = meeting_hash).organiser.contact
         self.fields['meeting_agenda'].initial = Meeting.objects.get(meeting_hash = meeting_hash).title
@@ -53,5 +52,5 @@ class ResponseForm(forms.Form):
     meeting_agenda = forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
     organiser_contact_number = forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
     meeting_hash = forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
-    best_slots = forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    best_slots = forms.CharField(widget=forms.Textarea(attrs={'readonly':'readonly'}))
     response_count = forms.IntegerField(widget=forms.TextInput(attrs={'readonly':'rea, donly'}))

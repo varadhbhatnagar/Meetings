@@ -3,7 +3,7 @@ from django.template import loader
 from django.http import HttpResponse
 from .forms import OrganiserForm, ParticipantForm, ResponseForm
 from .models import Meeting, Participant, MeetingParticipant, MeetingParticipantSlot
-from .util import get_feasible_slots, get_random_alphanumeric_string, get_slots, update_best_slots, NUMBER_OF_MINUTES_IN_A_DAY, flip_slots
+from .util import get_most_suitable_slots, get_hash, update_current_suitable_slots, flip_slots, get_slot_choices
 
 
 def organiser_view(request):
@@ -21,11 +21,11 @@ def organiser_view(request):
             organiser.save()
 
             meeting = Meeting()
-            meeting.meeting_hash = get_random_alphanumeric_string()
             meeting.organiser = organiser
             meeting.duration = form.cleaned_data['meeting_duration']
             meeting.date = form.cleaned_data['meeting_date']
             meeting.title = form.cleaned_data['meeting_agenda']
+            meeting.meeting_hash = get_hash()
             meeting.save()
 
             meeting_participant = MeetingParticipant()
@@ -60,7 +60,7 @@ def participant_view(request, meeting_hash):
             participant = Participant()
             participant.contact = form.cleaned_data['participant_contact_number']
 
-            if Participant.objects.filter(contact = participant.contact).first() != None:
+            if MeetingParticipant.objects.filter(participant = participant).first() != None:
                 message = 'You have already filled the form once. Cannnot fill again !'
 
             else:
@@ -68,11 +68,12 @@ def participant_view(request, meeting_hash):
 
                 meeting_participant = MeetingParticipant()
                 meeting_participant.participant = participant
-                meeting_participant.meeting = Meeting.objects.get(meeting_hash = form.cleaned_data['meeting_hash'])
+                meeting_participant.meeting = Meeting.objects.filter(meeting_hash = form.cleaned_data['meeting_hash']).first()
                 meeting_participant.save()
 
                 if form.cleaned_data['availability'] == '2':
-                    form.cleaned_data['slot'] = flip_slots(form.cleaned_data['slot'], int(NUMBER_OF_MINUTES_IN_A_DAY/int(meeting_participant.meeting.duration)))
+                    _, slot_count = get_slot_choices(int(meeting_participant.meeting.duration))
+                    form.cleaned_data['slot'] = flip_slots(form.cleaned_data['slot'], slot_count)
 
                 for slot in form.cleaned_data['slot']:
                     meeting_participant_slot = MeetingParticipantSlot()
@@ -95,22 +96,24 @@ def participant_view(request, meeting_hash):
 
 def response_view(request, meeting_hash):
     
-    meeting = Meeting.objects.get(meeting_hash = meeting_hash)
+    meeting = Meeting.objects.filter(meeting_hash = meeting_hash).first()
     meeting_participants = MeetingParticipant.objects.filter(meeting=meeting)
+    _, slot_count = get_slot_choices(int(meeting.duration))
 
-    best_slots = [0] * int(NUMBER_OF_MINUTES_IN_A_DAY/int(meeting.duration))
+    current_suitable_slots = [0] * slot_count
 
-    for p in meeting_participants:
-        meeting_participant_slot = MeetingParticipantSlot.objects.filter(meeting_participant=p)
-        best_slots = update_best_slots(meeting_participant_slot, best_slots)
+    for participant in meeting_participants:
+        meeting_participant_slot = MeetingParticipantSlot.objects.filter(meeting_participant=participant)
+        current_suitable_slots = update_current_suitable_slots(meeting_participant_slot, current_suitable_slots)
 
-    best_slots = get_feasible_slots(best_slots)
-    bs = ''
-    slots = get_slots(int(meeting.duration))
-    for b in range(len(best_slots)):
-        bs += slots[b][1]
-        bs += ", "
+    most_suitable_slots = get_most_suitable_slots(current_suitable_slots, limit = 8)
+    most_suitable_slots_string = ''
+    slot_choices, _ = get_slot_choices(int(meeting.duration))
 
-    initial = {'meeting_agenda': meeting.title, 'organiser_contact_number': meeting.organiser.contact, 'meeting_hash': meeting.meeting_hash, 'best_slots': bs, 'response_count': len(meeting_participants)}
+    for slot in most_suitable_slots:
+        most_suitable_slots_string += slot_choices[slot][1]
+        most_suitable_slots_string += "\n"
+
+    initial = {'meeting_agenda': meeting.title, 'organiser_contact_number': meeting.organiser.contact, 'meeting_hash': meeting.meeting_hash, 'best_slots': most_suitable_slots_string, 'response_count': len(meeting_participants)}
     form = ResponseForm(initial = initial)
     return render(request, 'response_page.html', {'form': form})
