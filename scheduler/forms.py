@@ -51,6 +51,6 @@ class ResponseForm(forms.Form):
 
     meeting_agenda = forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
     organiser_contact_number = forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
-    meeting_hash = forms.CharField(widget=forms.TextInput(attrs={'readonly':'readonly'}))
+    meeting_hash = forms.CharField(widget=forms.HiddenInput())
     best_slots = forms.CharField(widget=forms.Textarea(attrs={'readonly':'readonly'}))
     response_count = forms.IntegerField(widget=forms.TextInput(attrs={'readonly':'rea, donly'}))
