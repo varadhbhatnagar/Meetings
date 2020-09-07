@@ -2,7 +2,7 @@ import datetime
 from random import randint
 import numpy
 from hashids import Hashids
-
+import ast
 
 def get_hash():
     r1 = randint(0, 5000)
@@ -12,13 +12,10 @@ def get_hash():
     return hash
     
 
-def update_current_suitable_slots(queryset, best_slots):
-    participant_free_slots = list(queryset)
-
-    for i in participant_free_slots:
-        if i.slot:
-            best_slots[int(i.slot)]+=1
-
+def update_current_suitable_slots(slot_string, best_slots):
+    slot_list = ast.literal_eval(slot_string)
+    for i in slot_list:
+        best_slots[int(i)]+=1
     return best_slots
 
 

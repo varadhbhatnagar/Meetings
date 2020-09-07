@@ -2,6 +2,7 @@ from django.db import models
 
 class Participant(models.Model):
     contact = models.CharField(primary_key=True, max_length=10)
+    name = models.CharField(max_length=100)
 
 class Meeting(models.Model):
     meeting_hash = models.CharField(max_length = 100, primary_key = True)
